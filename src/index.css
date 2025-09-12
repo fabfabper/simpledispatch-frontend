@@ -1,0 +1,20 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@import "tailwindcss";
+
+body,
+html,
+#root {
+  height: 100vh;
+  width: 100vw;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  @apply bg-white text-gray-900 font-sans min-h-screen min-w-full;
+}
+
+/* Remove legacy CSS, use Tailwind utility classes in components instead */

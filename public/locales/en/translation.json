@@ -1,0 +1,19 @@
+{
+  "lists": "Lists",
+  "event": "Event",
+  "units": "Units",
+  "events": "Events",
+  "fire": "Fire",
+  "accident": "Accident",
+  "ambulance": "Ambulance",
+  "firetruck": "Fire Truck",
+  "add_event": "Add Event",
+  "edit_event": "Edit Event",
+  "name": "Name",
+  "type": "Type",
+  "latitude": "Lat",
+  "longitude": "Lon",
+  "save_changes": "Save Changes",
+  "cancel": "Cancel",
+  "location": "Location"
+}

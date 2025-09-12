@@ -1,0 +1,19 @@
+{
+  "lists": "Listen",
+  "event": "Ereignis",
+  "units": "Einheiten",
+  "events": "Ereignisse",
+  "fire": "Feuer",
+  "accident": "Unfall",
+  "ambulance": "Ambulanz",
+  "firetruck": "Feuerwehr",
+  "add_event": "Ereignis hinzufügen",
+  "edit_event": "Ereignis bearbeiten",
+  "name": "Name",
+  "type": "Typ",
+  "latitude": "Breitengrad",
+  "longitude": "Längengrad",
+  "save_changes": "Änderungen speichern",
+  "cancel": "Abbrechen",
+  "location": "Ort"
+}
