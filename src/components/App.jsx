@@ -1,13 +1,13 @@
 import { useEffect, useState } from "react";
 import { useRef } from "react";
-import { useDispatchStore } from "./store";
+import { useDispatchStore } from "../utils";
 import { useTranslation } from "react-i18next";
 import EventList from "./EventList";
 import UnitList from "./UnitList";
 import Map from "./Map";
 import EventForm from "./EventForm";
 import "leaflet/dist/leaflet.css";
-import "./App.css";
+import "../App.css";
 
 function App() {
   const wsRef = useRef(null);
@@ -34,7 +34,7 @@ function App() {
 
   useEffect(() => {
     // Import API and WebSocket modules
-    import("./api").then(({ fetchEvents, fetchUnits }) => {
+    import("../services/api").then(({ fetchEvents, fetchUnits }) => {
       fetchEvents()
         .then((data) => {
           if (Array.isArray(data)) {
@@ -51,15 +51,17 @@ function App() {
         .catch((err) => console.error("Error fetching units:", err));
     });
 
-    import("./websocket").then(({ connectWebSocket, disconnectWebSocket }) => {
-      wsRef.current = connectWebSocket((msg) => {
-        // handle incoming messages here
-        // Example: { type: 'event_update', event: {...} }
-        // You can update Zustand store accordingly
-      });
-    });
+    import("../services/websocket").then(
+      ({ connectWebSocket, disconnectWebSocket }) => {
+        wsRef.current = connectWebSocket((msg) => {
+          // handle incoming messages here
+          // Example: { type: 'event_update', event: {...} }
+          // You can update Zustand store accordingly
+        });
+      }
+    );
     return () => {
-      import("./websocket").then(({ disconnectWebSocket }) => {
+      import("../services/websocket").then(({ disconnectWebSocket }) => {
         disconnectWebSocket();
       });
     };

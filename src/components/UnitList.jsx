@@ -1,8 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { cn } from "./lib/cn";
-import { iconMap } from "./iconMap";
-import { statusMap } from "./statusMap";
+import { cn } from "../utils";
+import { iconMap, statusMap } from "../constants";
 
 function UnitList({ units, selectedId, onSelect }) {
   const { t } = useTranslation();
@@ -10,12 +9,14 @@ function UnitList({ units, selectedId, onSelect }) {
     <div className="mb-8">
       <h2 className="text-lg font-semibold mb-2">{t("units")}</h2>
       <div className="grid gap-2">
-        {units.map((unit) => {
+        {units.map((unit, index) => {
           const Icon = iconMap[unit.type];
-          const color = statusMap[unit.statusId] || "#e5e7eb";
+          const color = statusMap[unit.status] || "#e5e7eb";
+          // Ensure we have a valid key - use id if available, otherwise use index
+          const key = unit.id != null ? unit.id : `unit-${index}`;
           return (
             <div
-              key={unit.id}
+              key={key}
               className={cn(
                 "border rounded shadow-sm p-3 flex flex-col cursor-pointer transition-all",
                 selectedId === unit.id
@@ -26,7 +27,7 @@ function UnitList({ units, selectedId, onSelect }) {
               onClick={() => onSelect("unit", unit.id)}
             >
               <div className="font-semibold text-base mb-1 flex items-center justify-between">
-                <span>{unit.name}</span>
+                <span>{unit.id}</span>
                 {Icon && <Icon className="inline text-lg text-gray-500 ml-2" />}
               </div>
             </div>

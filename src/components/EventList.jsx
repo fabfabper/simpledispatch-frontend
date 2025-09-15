@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { cn } from "./lib/cn";
-import { iconMap } from "./iconMap";
+import { cn } from "../utils";
+import { iconMap } from "../constants";
 
 function EventList({ events, selectedId, onSelect, onDoubleClick }) {
   const { t } = useTranslation();
