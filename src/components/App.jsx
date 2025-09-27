@@ -6,6 +6,8 @@ import EventList from "./EventList";
 import UnitList from "./UnitList";
 import Map from "./Map";
 import EventForm from "./EventForm";
+import UnitForm from "./UnitForm";
+import { updateUnitApi } from "../services/api";
 import "leaflet/dist/leaflet.css";
 import "../App.css";
 
@@ -13,7 +15,8 @@ function App() {
   const wsRef = useRef(null);
   const { t, i18n } = useTranslation();
   // Sample data for events and units
-  const { events, units, addEvent, updateEvent } = useDispatchStore();
+  const { events, units, addEvent, updateEvent, updateUnit } =
+    useDispatchStore();
 
   // Highlight state
   const [selectedId, setSelectedId] = useState(null);
@@ -21,13 +24,9 @@ function App() {
 
   // Tab state
   const [activeTab, setActiveTab] = useState("lists");
-  const [selectedEvent, setSelectedEvent] = useState(null);
-  const [newEvent, setNewEvent] = useState({
-    name: "",
-    type: "",
-    position: ["", ""],
-  });
+  // Removed unused selectedEvent
   const [editEvent, setEditEvent] = useState(null);
+  const [editUnit, setEditUnit] = useState(null);
   const [sidebarWidth, setSidebarWidth] = useState(320);
   const sidebarRef = useRef();
   const isResizing = useRef(false);
@@ -101,8 +100,12 @@ function App() {
 
   const handleEventDoubleClick = (event) => {
     setEditEvent(event);
-    setSelectedEvent(null);
-    setActiveTab("event");
+    setActiveTab("details");
+  };
+
+  const handleUnitDoubleClick = (unit) => {
+    setEditUnit(unit);
+    setActiveTab("details");
   };
 
   return (
@@ -128,18 +131,18 @@ function App() {
           <button
             className={
               `flex-1 py-2 border-b-2 transition-colors ` +
-              (activeTab === "event"
+              (activeTab === "details"
                 ? "border-blue-600 bg-blue-100 text-blue-900 font-bold shadow-sm"
                 : "border-transparent bg-transparent text-gray-700 hover:bg-gray-100")
             }
             onClick={() => {
-              setActiveTab("event");
-              setSelectedEvent(null);
+              setActiveTab("details");
               setEditEvent(null);
+              setEditUnit(null);
             }}
-            aria-current={activeTab === "event" ? "page" : undefined}
+            aria-current={activeTab === "details" ? "page" : undefined}
           >
-            {t("event")}
+            {t("details")}
           </button>
         </div>
         {activeTab === "lists" && (
@@ -157,13 +160,14 @@ function App() {
                 units={units}
                 selectedId={selectedType === "unit" ? selectedId : null}
                 onSelect={handleSelect}
+                onDoubleClick={handleUnitDoubleClick}
               />
             </div>
           </div>
         )}
-        {activeTab === "event" && (
+        {activeTab === "details" && (
           <div className="p-4">
-            {editEvent ? (
+            {editEvent && (
               <EventForm
                 event={editEvent}
                 onSubmit={(updated) => {
@@ -176,26 +180,22 @@ function App() {
                   setActiveTab("lists");
                 }}
               />
-            ) : (
-              <EventForm
-                event={null}
-                onSubmit={(created) => {
-                  const newId = events.length
-                    ? Math.max(
-                        ...events.map((ev) =>
-                          typeof ev.id === "number" ? ev.id : 0
-                        )
-                      ) + 1
-                    : 1;
-                  addEvent({
-                    id: newId,
-                    name: created.name,
-                    type: created.type,
-                    position: [
-                      parseFloat(created.position[0]),
-                      parseFloat(created.position[1]),
-                    ],
-                  });
+            )}
+            {editUnit && (
+              <UnitForm
+                unit={editUnit}
+                onSubmit={async (updated) => {
+                  try {
+                    const saved = await updateUnitApi(editUnit.id, updated);
+                    updateUnit(editUnit.id, saved);
+                  } catch (err) {
+                    alert((err && err.message) || "Failed to update unit");
+                  }
+                  setEditUnit(null);
+                  setActiveTab("lists");
+                }}
+                onCancel={() => {
+                  setEditUnit(null);
                   setActiveTab("lists");
                 }}
               />

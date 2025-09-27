@@ -1,3 +1,37 @@
+// Update a unit by ID
+export async function updateUnitApi(
+  id: string,
+  unit: Partial<Unit>
+): Promise<Unit> {
+  const res = await fetch(`http://localhost:5035/api/units/${id}`, {
+    method: "PUT",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(unit),
+  });
+  if (!res.ok) throw new Error("Failed to update unit");
+  const responseData = await res.json();
+  // Assume response is the updated unit or wrapped in UnitApiResponse
+  if (
+    responseData &&
+    typeof responseData === "object" &&
+    "success" in responseData
+  ) {
+    const unitApiResponse: UnitApiResponse = responseData;
+    if (unitApiResponse.success && unitApiResponse.data) {
+      return unitApiResponse.data;
+    } else {
+      throw new Error(
+        unitApiResponse.error ||
+          unitApiResponse.message ||
+          "Failed to update unit"
+      );
+    }
+  } else if (responseData) {
+    return responseData as Unit;
+  } else {
+    throw new Error("No unit data received");
+  }
+}
 // api.ts
 // HTTP request functions for events and units
 

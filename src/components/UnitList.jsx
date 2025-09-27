@@ -3,7 +3,7 @@ import { useTranslation } from "react-i18next";
 import { cn } from "../utils";
 import { iconMap, statusMap } from "../constants";
 
-function UnitList({ units, selectedId, onSelect }) {
+function UnitList({ units, selectedId, onSelect, onDoubleClick }) {
   const { t } = useTranslation();
   return (
     <div className="mb-8">
@@ -25,6 +25,9 @@ function UnitList({ units, selectedId, onSelect }) {
               )}
               style={{ background: color }}
               onClick={() => onSelect("unit", unit.id)}
+              onDoubleClick={
+                onDoubleClick ? () => onDoubleClick(unit) : undefined
+              }
             >
               <div className="font-semibold text-base mb-1 flex items-center justify-between">
                 <span>{unit.id}</span>
