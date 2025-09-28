@@ -3,13 +3,60 @@ export async function updateUnitApi(
   id: string,
   unit: Partial<Unit>
 ): Promise<Unit> {
+  console.log("API - updateUnitApi called with ID:", id);
+  console.log("API - updateUnitApi called with unit:", unit);
+  console.log("API - JSON payload being sent:", JSON.stringify(unit, null, 2));
+
   const res = await fetch(`http://localhost:5035/api/units/${id}`, {
     method: "PUT",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(unit),
   });
-  if (!res.ok) throw new Error("Failed to update unit");
-  const responseData = await res.json();
+
+  console.log("API - Response status:", res.status);
+  console.log("API - Response ok:", res.ok);
+
+  if (!res.ok) {
+    const errorText = await res.text();
+    console.log("API - Error response text:", errorText);
+    throw new Error(`Failed to update unit: ${res.status} ${errorText}`);
+  }
+
+  // Check if response has content
+  const contentLength = res.headers.get("content-length");
+  console.log("API - Content-Length:", contentLength);
+
+  // If response is empty (common for PUT operations), return the updated unit
+  if (contentLength === "0" || res.status === 204) {
+    console.log("API - Empty response, returning updated unit data");
+    return unit as Unit; // Return the unit we sent (assuming it was accepted)
+  }
+
+  let responseData;
+  try {
+    responseData = await res.json();
+    console.log("API - Response data:", responseData);
+  } catch (jsonError) {
+    console.error("API - JSON parse error:", jsonError);
+    // Check if response is actually empty
+    const rawText = await res.clone().text();
+    console.log("API - Raw response text:", `"${rawText}"`);
+    console.log("API - Raw text length:", rawText.length);
+
+    if (rawText.trim() === "") {
+      console.log("API - Response is empty, returning updated unit data");
+      return unit as Unit;
+    }
+
+    console.log(
+      "API - Response headers:",
+      Object.fromEntries(res.headers.entries())
+    );
+    throw new Error(
+      `Server returned invalid JSON: ${rawText.substring(0, 200)}`
+    );
+  }
+
   // Assume response is the updated unit or wrapped in UnitApiResponse
   if (
     responseData &&

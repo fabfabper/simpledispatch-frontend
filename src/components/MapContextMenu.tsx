@@ -1,5 +1,19 @@
-// MapContextMenu.jsx
+// MapContextMenu.tsx
 import React from "react";
+
+interface LatLng {
+  lat: number;
+  lng: number;
+}
+
+interface MapContextMenuProps {
+  visible: boolean;
+  x: number;
+  y: number;
+  latlng?: LatLng | null;
+  onClose: () => void;
+  children?: React.ReactNode;
+}
 
 export default function MapContextMenu({
   visible,
@@ -8,7 +22,7 @@ export default function MapContextMenu({
   latlng,
   onClose,
   children,
-}) {
+}: MapContextMenuProps) {
   if (!visible) return null;
   return (
     <div

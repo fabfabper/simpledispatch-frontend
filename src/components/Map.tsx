@@ -3,8 +3,23 @@ import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { leafletIconForType } from "../utils";
 import { statusMap } from "../constants";
+import type { Unit } from "@fabfabper/simpledispatch-shared-models/typescript/Unit";
+import type { Event } from "@fabfabper/simpledispatch-shared-models/typescript/Event";
 
-function CenterMap({ position, zoom }) {
+interface CenterMapProps {
+  position: [number, number] | null;
+  zoom: number;
+}
+
+interface MapProps {
+  events: Event[];
+  units: Unit[];
+  selectedId: string | number | null;
+  selectedType: 'event' | 'unit' | null;
+  onMarkerClick: (type: 'event' | 'unit', id: string | number) => void;
+}
+
+function CenterMap({ position, zoom }: CenterMapProps) {
   const map = useMap();
   useEffect(() => {
     if (position) {
@@ -14,15 +29,20 @@ function CenterMap({ position, zoom }) {
   return null;
 }
 
-function Map({ events, units, selectedId, selectedType, onMarkerClick }) {
+function Map({ events, units, selectedId, selectedType, onMarkerClick }: MapProps) {
   let selectedPosition = null;
   if (selectedType === "event") {
     const event = events.find((e) => e.id === selectedId);
     if (event) selectedPosition = event.position;
   } else if (selectedType === "unit") {
     const unit = units.find((u) => u.id === selectedId);
-    if (unit && unit.latitude != null && unit.longitude != null) {
-      selectedPosition = [unit.latitude, unit.longitude];
+    if (
+      unit &&
+      unit.position &&
+      unit.position.latitude != null &&
+      unit.position.longitude != null
+    ) {
+      selectedPosition = [unit.position.latitude, unit.position.longitude];
     }
   }
   const defaultCenter = [47.378177, 8.540192]; // Zurich HB (main station)
@@ -115,10 +135,18 @@ function Map({ events, units, selectedId, selectedType, onMarkerClick }) {
           });
 
           // Only render marker if we have valid coordinates and icon
-          if (unit.latitude == null || unit.longitude == null || !icon)
+          if (
+            !unit.position ||
+            unit.position.latitude == null ||
+            unit.position.longitude == null ||
+            !icon
+          )
             return null;
 
-          const unitPosition = [unit.latitude, unit.longitude];
+          const unitPosition = [
+            unit.position.latitude,
+            unit.position.longitude,
+          ];
 
           return (
             <Marker

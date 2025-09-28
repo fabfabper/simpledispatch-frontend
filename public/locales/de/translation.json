@@ -15,5 +15,11 @@
   "longitude": "Längengrad",
   "save_changes": "Änderungen speichern",
   "cancel": "Abbrechen",
-  "location": "Ort"
+  "location": "Ort",
+  "details": "Details",
+  "id": "ID",
+  "status": "Status",
+  "edit_unit": "Einheit bearbeiten",
+  "add_unit": "Einheit hinzufügen",
+  "create_event": "Ereignis erstellen"
 }

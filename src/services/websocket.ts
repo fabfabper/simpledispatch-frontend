@@ -8,7 +8,7 @@ let socket: WebSocket | null = null;
 export function connectWebSocket(
   onMessage?: (msg: AnyCommand) => void
 ): WebSocket {
-  socket = new WebSocket("ws://localhost:5205/ws");
+  socket = new WebSocket("ws://localhost:5000/ws");
   socket.onopen = () => {
     console.log("WebSocket connected");
   };

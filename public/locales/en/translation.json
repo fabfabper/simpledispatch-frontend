@@ -15,5 +15,11 @@
   "longitude": "Lon",
   "save_changes": "Save Changes",
   "cancel": "Cancel",
-  "location": "Location"
+  "location": "Location",
+  "details": "Details",
+  "id": "ID",
+  "status": "Status",
+  "edit_unit": "Edit Unit",
+  "add_unit": "Add Unit",
+  "create_event": "Create event"
 }

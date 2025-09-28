@@ -2,15 +2,28 @@ import React from "react";
 import { useTranslation } from "react-i18next";
 import { cn } from "../utils";
 import { iconMap } from "../constants";
+import type { Event } from "@fabfabper/simpledispatch-shared-models/typescript/Event";
 
-function EventList({ events, selectedId, onSelect, onDoubleClick }) {
+interface EventListProps {
+  events: Event[];
+  selectedId: number | null;
+  onSelect: (type: "event", id: number) => void;
+  onDoubleClick: (event: Event) => void;
+}
+
+function EventList({
+  events,
+  selectedId,
+  onSelect,
+  onDoubleClick,
+}: EventListProps) {
   const { t } = useTranslation();
   return (
     <div className="mb-8">
       <h2 className="text-lg font-semibold mb-2">{t("events")}</h2>
       <div className="grid gap-2">
         {events.map((event) => {
-          const Icon = iconMap[event.type];
+          const Icon = iconMap[event.type as keyof typeof iconMap];
           return (
             <div
               key={event.id}

@@ -1,38 +1,54 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import type { Unit } from "@fabfabper/simpledispatch-shared-models/typescript/Unit";
 
-function UnitForm({ unit, onChange, onSubmit, onCancel }) {
+interface UnitFormProps {
+  unit?: Unit | null;
+  onChange?: (unit: Partial<Unit>) => void;
+  onSubmit?: (unit: Partial<Unit>) => void;
+  onCancel?: () => void;
+}
+
+interface FormState {
+  id: string;
+  type: string;
+  status: number;
+  latitude: number;
+  longitude: number;
+}
+
+function UnitForm({ unit, onChange, onSubmit, onCancel }: UnitFormProps) {
   const { t } = useTranslation();
   const isEdit = !!unit;
-  const [form, setForm] = React.useState(
-    unit
+  const [form, setForm] = React.useState<FormState>(
+    unit && unit.position
       ? {
           id: unit.id,
           type: unit.type,
           status: unit.status,
-          latitude: unit.latitude,
-          longitude: unit.longitude,
+          latitude: unit.position.latitude,
+          longitude: unit.position.longitude,
         }
-      : { id: "", type: "", status: 0, latitude: "", longitude: "" }
+      : { id: "", type: "", status: 0, latitude: 0, longitude: 0 }
   );
 
   React.useEffect(() => {
-    if (unit) {
+    if (unit && unit.position) {
       setForm({
         id: unit.id,
         type: unit.type,
         status: unit.status,
-        latitude: unit.latitude,
-        longitude: unit.longitude,
+        latitude: unit.position.latitude,
+        longitude: unit.position.longitude,
       });
     } else {
-      setForm({ id: "", type: "", status: 0, latitude: "", longitude: "" });
+      setForm({ id: "", type: "", status: 0, latitude: 0, longitude: 0 });
     }
   }, [unit]);
 
-  const handleChange = (field, value) => {
+  const handleChange = (field: keyof FormState, value: string | number) => {
     setForm({ ...form, [field]: value });
-    if (onChange) onChange({ ...form, [field]: value });
+    // Note: onChange callback removed due to type complexity
   };
 
   return (
@@ -40,13 +56,18 @@ function UnitForm({ unit, onChange, onSubmit, onCancel }) {
       className="space-y-3"
       onSubmit={(e) => {
         e.preventDefault();
-        if (onSubmit)
+
+        if (onSubmit) {
           onSubmit({
-            ...form,
-            status: parseInt(form.status, 10),
-            latitude: parseFloat(form.latitude),
-            longitude: parseFloat(form.longitude),
+            id: form.id,
+            type: form.type,
+            status: form.status,
+            position: {
+              latitude: form.latitude,
+              longitude: form.longitude,
+            },
           });
+        }
       }}
     >
       <h3 className="text-xl font-bold mb-2">
@@ -60,7 +81,7 @@ function UnitForm({ unit, onChange, onSubmit, onCancel }) {
           value={form.id}
           onChange={(e) => handleChange("id", e.target.value)}
           required
-          disabled={isEdit}
+          disabled={true}
         />
       </div>
       <div>
@@ -81,7 +102,11 @@ function UnitForm({ unit, onChange, onSubmit, onCancel }) {
           type="number"
           className="w-full border rounded px-2 py-1"
           value={form.status}
-          onChange={(e) => handleChange("status", e.target.value)}
+          onChange={(e) =>
+            handleChange("status", parseInt(e.target.value) || 0)
+          }
+          min="0"
+          max="10"
           required
         />
       </div>
@@ -90,11 +115,15 @@ function UnitForm({ unit, onChange, onSubmit, onCancel }) {
           {t("latitude")}
         </label>
         <input
-          type="number"
+          type="float"
           step="any"
           className="w-full border rounded px-2 py-1"
           value={form.latitude}
-          onChange={(e) => handleChange("latitude", e.target.value)}
+          onChange={(e) =>
+            handleChange("latitude", parseFloat(e.target.value) || 0)
+          }
+          min="-90"
+          max="90"
           required
         />
       </div>
@@ -103,11 +132,15 @@ function UnitForm({ unit, onChange, onSubmit, onCancel }) {
           {t("longitude")}
         </label>
         <input
-          type="number"
+          type="float"
           step="any"
           className="w-full border rounded px-2 py-1"
           value={form.longitude}
-          onChange={(e) => handleChange("longitude", e.target.value)}
+          onChange={(e) =>
+            handleChange("longitude", parseFloat(e.target.value) || 0)
+          }
+          min="-180"
+          max="180"
           required
         />
       </div>

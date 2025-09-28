@@ -27,6 +27,7 @@ function App() {
   // Removed unused selectedEvent
   const [editEvent, setEditEvent] = useState(null);
   const [editUnit, setEditUnit] = useState(null);
+  const [isCreatingNewEvent, setIsCreatingNewEvent] = useState(false);
   const [sidebarWidth, setSidebarWidth] = useState(320);
   const sidebarRef = useRef();
   const isResizing = useRef(false);
@@ -100,11 +101,15 @@ function App() {
 
   const handleEventDoubleClick = (event) => {
     setEditEvent(event);
+    setEditUnit(null); // Clear any existing unit
+    setIsCreatingNewEvent(false); // Clear new event creation mode
     setActiveTab("details");
   };
 
   const handleUnitDoubleClick = (unit) => {
     setEditUnit(unit);
+    setEditEvent(null); // Clear any existing event
+    setIsCreatingNewEvent(false); // Clear new event creation mode
     setActiveTab("details");
   };
 
@@ -123,7 +128,13 @@ function App() {
                 ? "border-blue-600 bg-blue-100 text-blue-900 font-bold shadow-sm"
                 : "border-transparent bg-transparent text-gray-700 hover:bg-gray-100")
             }
-            onClick={() => setActiveTab("lists")}
+            onClick={() => {
+              setActiveTab("lists");
+              // Clear edit states so second tab shows "Create event"
+              setEditEvent(null);
+              setEditUnit(null);
+              setIsCreatingNewEvent(false);
+            }}
             aria-current={activeTab === "lists" ? "page" : undefined}
           >
             {t("lists")}
@@ -137,12 +148,16 @@ function App() {
             }
             onClick={() => {
               setActiveTab("details");
+              // Show empty event form for creating new event
+              setIsCreatingNewEvent(true);
               setEditEvent(null);
               setEditUnit(null);
             }}
             aria-current={activeTab === "details" ? "page" : undefined}
           >
-            {t("details")}
+            {(editEvent && !isCreatingNewEvent) || editUnit
+              ? t("details")
+              : t("create_event")}
           </button>
         </div>
         {activeTab === "lists" && (
@@ -167,28 +182,53 @@ function App() {
         )}
         {activeTab === "details" && (
           <div className="p-4">
-            {editEvent && (
+            {editEvent || isCreatingNewEvent ? (
               <EventForm
-                event={editEvent}
+                event={isCreatingNewEvent ? null : editEvent}
+                onChange={() => {}} // Add required onChange prop (can be empty for now)
                 onSubmit={(updated) => {
-                  updateEvent(editEvent.id, updated);
+                  if (isCreatingNewEvent) {
+                    // Create new event
+                    addEvent({ ...updated, id: Date.now() }); // Simple ID generation
+                  } else if (editEvent) {
+                    // Update existing event
+                    updateEvent(editEvent.id, updated);
+                  }
                   setEditEvent(null);
+                  setIsCreatingNewEvent(false);
                   setActiveTab("lists");
                 }}
                 onCancel={() => {
                   setEditEvent(null);
+                  setIsCreatingNewEvent(false);
                   setActiveTab("lists");
                 }}
               />
-            )}
-            {editUnit && (
+            ) : editUnit ? (
               <UnitForm
                 unit={editUnit}
                 onSubmit={async (updated) => {
+                  console.log(
+                    "App.tsx - Received data from UnitForm:",
+                    updated
+                  );
+                  console.log("App.tsx - Sending to API with ID:", editUnit.id);
+                  console.log(
+                    "App.tsx - JSON payload:",
+                    JSON.stringify(updated, null, 2)
+                  );
+
                   try {
                     const saved = await updateUnitApi(editUnit.id, updated);
+                    console.log("App.tsx - API response:", saved);
                     updateUnit(editUnit.id, saved);
                   } catch (err) {
+                    console.error("App.tsx - API error:", err);
+                    console.error("App.tsx - Error message:", err.message);
+                    console.error(
+                      "App.tsx - Full error:",
+                      JSON.stringify(err, null, 2)
+                    );
                     alert((err && err.message) || "Failed to update unit");
                   }
                   setEditUnit(null);
@@ -199,6 +239,12 @@ function App() {
                   setActiveTab("lists");
                 }}
               />
+            ) : (
+              <div className="text-gray-500 text-center py-8">
+                <p>
+                  Double-click an event or unit from the list to view details
+                </p>
+              </div>
             )}
           </div>
         )}
