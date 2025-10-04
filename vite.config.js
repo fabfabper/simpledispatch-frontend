@@ -17,6 +17,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      "/api/configurations": {
+        target: "http://localhost:5035",
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

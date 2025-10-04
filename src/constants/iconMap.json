@@ -1,4 +1,9 @@
 {
+  "0": "FaFire",
+  "1": "FaCarCrash",
+  "2": "FaAmbulance",
+  "3": "FaTruck",
+  "4": "FaCar",
   "fire": "FaFire",
   "accident": "FaCarCrash",
   "ambulance": "FaAmbulance",

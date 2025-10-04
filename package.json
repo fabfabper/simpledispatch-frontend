@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@fabfabper/simpledispatch-shared-models": "^1.10.0",
+    "@fabfabper/simpledispatch-shared-models": "^1.11.0",
     "@simpledispatch/simpledispatch-dtos": "github:fabfabper/simpledispatch-shared-models#v1.1.0",
     "@tailwindcss/postcss": "^4.1.12",
     "@tailwindcss/vite": "^4.1.12",

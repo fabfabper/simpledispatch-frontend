@@ -1,8 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-import { leafletIconForType } from "../utils";
-import { statusMap } from "../constants";
+import { leafletIconForType, getUnitStatusColor } from "../utils";
 import type { Unit } from "@fabfabper/simpledispatch-shared-models/typescript/Unit";
 import type { Event } from "@fabfabper/simpledispatch-shared-models/typescript/Event";
 
@@ -15,8 +14,8 @@ interface MapProps {
   events: Event[];
   units: Unit[];
   selectedId: string | number | null;
-  selectedType: 'event' | 'unit' | null;
-  onMarkerClick: (type: 'event' | 'unit', id: string | number) => void;
+  selectedType: "event" | "unit" | null;
+  onMarkerClick: (type: "event" | "unit", id: string | number) => void;
 }
 
 function CenterMap({ position, zoom }: CenterMapProps) {
@@ -29,7 +28,13 @@ function CenterMap({ position, zoom }: CenterMapProps) {
   return null;
 }
 
-function Map({ events, units, selectedId, selectedType, onMarkerClick }: MapProps) {
+function Map({
+  events,
+  units,
+  selectedId,
+  selectedType,
+  onMarkerClick,
+}: MapProps) {
   let selectedPosition = null;
   if (selectedType === "event") {
     const event = events.find((e) => e.id === selectedId);
@@ -121,7 +126,7 @@ function Map({ events, units, selectedId, selectedType, onMarkerClick }: MapProp
           // Ensure we have a valid key - use id if available, otherwise use index
           const key = unit.id != null ? unit.id : `unit-marker-${index}`;
           // Get the icon, ensuring it's never null
-          const icon = leafletIconForType(unit.type, {
+          const icon = leafletIconForType(String(unit.type), {
             size: selectedType === "unit" && selectedId === unit.id ? 40 : 32,
             iconSize:
               selectedType === "unit" && selectedId === unit.id
@@ -131,7 +136,7 @@ function Map({ events, units, selectedId, selectedType, onMarkerClick }: MapProp
               selectedType === "unit" && selectedId === unit.id
                 ? [20, 40]
                 : [16, 32],
-            color: statusMap[unit.status] || "#555",
+            color: getUnitStatusColor(unit.status),
           });
 
           // Only render marker if we have valid coordinates and icon

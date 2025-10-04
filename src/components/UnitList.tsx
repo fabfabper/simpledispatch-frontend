@@ -1,7 +1,7 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
-import { cn } from "../utils";
-import { iconMap, statusMap } from "../constants";
+import { cn, getUnitStatusColor } from "../utils";
+import { iconMap } from "../constants";
 import type { Unit } from "@fabfabper/simpledispatch-shared-models/typescript/Unit";
 
 interface UnitListProps {
@@ -23,9 +23,8 @@ function UnitList({
       <h2 className="text-lg font-semibold mb-2">{t("units")}</h2>
       <div className="grid gap-2">
         {units.map((unit, index) => {
-          const Icon = iconMap[unit.type as keyof typeof iconMap];
-          const color =
-            statusMap[unit.status as keyof typeof statusMap] || "#e5e7eb";
+          const Icon = iconMap[String(unit.type) as keyof typeof iconMap];
+          const color = getUnitStatusColor(unit.status);
           // Ensure we have a valid key - use id if available, otherwise use index
           const key = unit.id != null ? unit.id : `unit-${index}`;
           return (

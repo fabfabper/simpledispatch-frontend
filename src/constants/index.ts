@@ -8,7 +8,6 @@ import {
 } from "react-icons/fa";
 
 import iconMapJson from "./iconMap.json";
-import statusMapJson from "./statusMap.json";
 
 // Map from icon name strings to actual React components
 const iconComponents = {
@@ -27,5 +26,4 @@ Object.entries(iconMapJson).forEach(([key, iconName]) => {
   }
 });
 
-// Export statusMap directly from JSON
-export const statusMap = statusMapJson;
+// statusMap is now handled by the configuration store

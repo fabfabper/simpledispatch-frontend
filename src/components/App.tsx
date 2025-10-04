@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useRef } from "react";
-import { useDispatchStore } from "../utils";
+import { useDispatchStore, useConfigurationStore } from "../utils";
 import { useTranslation } from "react-i18next";
 import { useTranslationStore } from "../utils/translationStore";
 import { loadTranslationsIntoI18n } from "../config/i18n";
@@ -21,6 +21,12 @@ function App() {
     isLoading: translationsLoading,
     error: translationsError,
   } = useTranslationStore();
+  const {
+    loadConfigurations,
+    isLoading: configurationsLoading,
+    error: configurationsError,
+    isInitialized: configurationsInitialized,
+  } = useConfigurationStore();
   // Sample data for events and units
   const { events, units, addEvent, updateEvent, updateUnit } =
     useDispatchStore();
@@ -43,6 +49,10 @@ function App() {
     // Load translations first
     const initializeApp = async () => {
       try {
+        // Load configurations first
+        await loadConfigurations();
+        console.log("Configurations loaded successfully");
+
         // Load translations for supported languages
         await loadTranslations(["en", "de"]);
 
@@ -52,7 +62,7 @@ function App() {
 
         console.log("Translations loaded successfully");
       } catch (error) {
-        console.error("Failed to load translations:", error);
+        console.error("Failed to initialize app:", error);
       }
     };
 
@@ -139,25 +149,32 @@ function App() {
     setActiveTab("details");
   };
 
-  // Show loading screen while translations are loading
-  if (translationsLoading) {
+  // Show loading screen while configurations or translations are loading
+  if (configurationsLoading || translationsLoading) {
+    const loadingText = configurationsLoading
+      ? "Loading configurations..."
+      : "Loading translations...";
+
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-background text-foreground">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-500 mx-auto mb-4"></div>
-          <p className="text-lg">Loading translations...</p>
+          <p className="text-lg">{loadingText}</p>
         </div>
       </div>
     );
   }
 
-  // Show error screen if translations failed to load
-  if (translationsError) {
+  // Show error screen if configurations or translations failed to load
+  if (configurationsError || translationsError) {
+    const errorMessage = configurationsError || translationsError;
+    const errorType = configurationsError ? "configurations" : "translations";
+
     return (
       <div className="flex h-screen w-screen items-center justify-center bg-background text-foreground">
         <div className="text-center text-red-600">
-          <p className="text-lg mb-2">Failed to load translations</p>
-          <p className="text-sm">{translationsError}</p>
+          <p className="text-lg mb-2">Failed to load {errorType}</p>
+          <p className="text-sm">{errorMessage}</p>
           <button
             className="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
             onClick={() => window.location.reload()}

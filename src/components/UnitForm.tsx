@@ -11,7 +11,7 @@ interface UnitFormProps {
 
 interface FormState {
   id: string;
-  type: string;
+  type: number;
   status: number;
   latitude: number;
   longitude: number;
@@ -29,7 +29,7 @@ function UnitForm({ unit, onChange, onSubmit, onCancel }: UnitFormProps) {
           latitude: unit.position.latitude,
           longitude: unit.position.longitude,
         }
-      : { id: "", type: "", status: 0, latitude: 0, longitude: 0 }
+      : { id: "", type: 0, status: 0, latitude: 0, longitude: 0 }
   );
 
   React.useEffect(() => {
@@ -42,7 +42,7 @@ function UnitForm({ unit, onChange, onSubmit, onCancel }: UnitFormProps) {
         longitude: unit.position.longitude,
       });
     } else {
-      setForm({ id: "", type: "", status: 0, latitude: 0, longitude: 0 });
+      setForm({ id: "", type: 0, status: 0, latitude: 0, longitude: 0 });
     }
   }, [unit]);
 
@@ -60,7 +60,10 @@ function UnitForm({ unit, onChange, onSubmit, onCancel }: UnitFormProps) {
         if (onSubmit) {
           onSubmit({
             id: form.id,
-            type: form.type,
+            type:
+              typeof form.type === "string"
+                ? parseInt(form.type, 10)
+                : form.type,
             status: form.status,
             position: {
               latitude: form.latitude,
@@ -87,10 +90,12 @@ function UnitForm({ unit, onChange, onSubmit, onCancel }: UnitFormProps) {
       <div>
         <label className="block text-sm font-semibold mb-1">{t("type")}</label>
         <input
-          type="text"
+          type="number"
           className="w-full border rounded px-2 py-1"
           value={form.type}
-          onChange={(e) => handleChange("type", e.target.value)}
+          onChange={(e) =>
+            handleChange("type", parseInt(e.target.value, 10) || 0)
+          }
           required
         />
       </div>
