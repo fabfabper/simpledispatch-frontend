@@ -12,6 +12,11 @@ export default defineConfig({
         changeOrigin: true,
         secure: false,
       },
+      "/api/translations": {
+        target: "http://localhost:5035",
+        changeOrigin: true,
+        secure: false,
+      },
     },
   },
 });

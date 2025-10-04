@@ -10,3 +10,9 @@ export {
   extractCoordinates,
   getLocationDisplayName,
 } from "./geoApi";
+export {
+  fetchTranslations,
+  fetchAllTranslations,
+  type TranslationData,
+  type TranslationsResponse,
+} from "./translationApi";
