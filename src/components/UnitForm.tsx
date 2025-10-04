@@ -1,5 +1,6 @@
 import React from "react";
 import { useTranslation } from "react-i18next";
+import { useConfigurations } from "../hooks/useConfigurations";
 import type { Unit } from "@fabfabper/simpledispatch-shared-models/typescript/Unit";
 
 interface UnitFormProps {
@@ -19,6 +20,7 @@ interface FormState {
 
 function UnitForm({ unit, onChange, onSubmit, onCancel }: UnitFormProps) {
   const { t } = useTranslation();
+  const { unitStatuses, isReady } = useConfigurations();
   const isEdit = !!unit;
   const [form, setForm] = React.useState<FormState>(
     unit && unit.position
@@ -103,17 +105,25 @@ function UnitForm({ unit, onChange, onSubmit, onCancel }: UnitFormProps) {
         <label className="block text-sm font-semibold mb-1">
           {t("status")}
         </label>
-        <input
-          type="number"
+        <select
           className="w-full border rounded px-2 py-1"
           value={form.status}
-          onChange={(e) =>
-            handleChange("status", parseInt(e.target.value) || 0)
-          }
-          min="0"
-          max="10"
+          onChange={(e) => handleChange("status", parseInt(e.target.value, 10))}
           required
-        />
+        >
+          {!isEdit && <option value="">{t("selectStatus")}</option>}
+          {isReady &&
+            unitStatuses.map((status) => (
+              <option key={status.id} value={status.id}>
+                {t(status.label, { defaultValue: status.label })}
+              </option>
+            ))}
+          {!isReady && (
+            <option value={form.status}>
+              {t("status")} {form.status}
+            </option>
+          )}
+        </select>
       </div>
       <div>
         <label className="block text-sm font-semibold mb-1">
